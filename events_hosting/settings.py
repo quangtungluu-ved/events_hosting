@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework'
 ]
 
 AUTH_USER_MODEL = 'accounts.User'
@@ -54,6 +55,14 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'events_hosting.urls'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'authentication.csrf.CsrfExemptSessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication'
+    )
+}
+
 
 TEMPLATES = [
     {
