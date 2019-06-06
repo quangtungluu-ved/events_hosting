@@ -1,14 +1,16 @@
 from django.db import models
 from django.conf import settings
-# Create your models here.
 
 
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    location = models.CharField(max_length=200)
+    location = models.CharField(max_length=200, blank=True)
     start_date = models.DateTimeField(db_index=True)
     end_date = models.DateTimeField(db_index=True)
+
+    def __str__(self):
+        return self.title
 
 
 class Channel(models.Model):
@@ -37,3 +39,8 @@ class Participation(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
+
+
+class Image(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='images')

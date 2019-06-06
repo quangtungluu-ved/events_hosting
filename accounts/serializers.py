@@ -4,7 +4,7 @@ from accounts.models import User
 from django.contrib.auth import authenticate as django_auth
 
 
-class Login(serializers.Serializer):
+class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
 
@@ -16,26 +16,26 @@ class Login(serializers.Serializer):
         return data
 
 
-class VisitorDetail(serializers.ModelSerializer):
+class VisitorDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('id', 'username', 'email')
 
 
-class VisitorCreate(serializers.Serializer):
+class VisitorCreateSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     password = serializers.CharField(required=True)
 
     def create(self, validated_data):
         validated_data['is_admin'] = 0
         validated_data['is_superuser'] = 0
-        visitor = User.objects.create(**validated_data)
-        visitor.set_password(validated_data.get('password'))
-        visitor.save()
-        return visitor
+        new_visitor = User.objects.create(**validated_data)
+        new_visitor.set_password(validated_data.get('password'))
+        new_visitor.save()
+        return new_visitor
 
 
-class VisitorUpdate(serializers.Serializer):
+class VisitorUpdateSerializer(serializers.Serializer):
     email = serializers.CharField(required=False)
     password = serializers.CharField(required=False)
 
