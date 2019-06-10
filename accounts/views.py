@@ -1,3 +1,6 @@
+import requests
+from django.conf import settings
+from django.shortcuts import redirect
 from django.contrib.auth import login as django_login, logout as django_logout
 from rest_framework import status
 from rest_framework.views import APIView
@@ -53,8 +56,8 @@ class VisitorView(APIView):
 
     def get(self, request, visitor_id):
         try:
-            saved_vistor = User.objects.exclude(
-                is_admin=True).get(pk=visitor_id)
+            saved_vistor = User.objects.filter(
+                is_admin=False).get(pk=visitor_id)
             serializer = VisitorDetailSerializer(saved_vistor)
             return Response(serializer.data)
         except User.DoesNotExist:
@@ -85,3 +88,34 @@ class VisitorView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def oauth_google(request):
+    client_id = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+    client_secret = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
+    redirect_uri = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
+    scope = 'email%20profile%20openid'
+    if 'code' not in request.GET:
+        auth_uri = ('https://accounts.google.com/o/oauth2/v2/auth?response_type=code'
+                    '&client_id={}&redirect_uri={}&scope={}').format(
+                        client_id,
+                        redirect_uri,
+                        scope)
+        return redirect(auth_uri)
+    else:
+        auth_code = request.GET.get('code')
+        data = {
+            'code': auth_code,
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'redirect_uri': redirect_uri,
+            'grant_type': 'authorization_code'
+        }
+        resp = requests.post(
+            url='https://www.googleapis.com/oauth2/v4/token',
+            data=data
+        )
+        print(resp.text)
+        return redirect("/admin")
