@@ -1,9 +1,10 @@
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import api_view, permission_classes
 
-from events.serializers import CommentSerializer
 from events.models import Like, Participation, Comment, Event
+from events.serializers import CommentSerializer, CommentBlockSerializer
 
 from utils.permissions import CommentOwnerOnly
 
@@ -39,19 +40,29 @@ def participate_event(request, event_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
 
-@api_view(['POST'])
+@api_view(['POST', 'GET'])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def comment_event(request, event_id):
-    current_user = request.user
     try:
         saved_event = Event.objects.get(pk=event_id)
+    except Event.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'POST':
+        current_user = request.user
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save(user=current_user, event=saved_event)
             return Response(status=status.HTTP_200_OK)
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
-    except Event.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    else:
+        offset = int(request.GET.get('offset', '0'))
+        serializer = CommentBlockSerializer({
+            'offset': offset,
+            'event_id': saved_event.id,
+            'comments': saved_event.comment_set.all(),
+        })
+        return Response(serializer.data)
 
 
 @api_view(['PUT'])

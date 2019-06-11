@@ -41,7 +41,7 @@ class EventSerializer(serializers.ModelSerializer):
 
 class EventDetailSerializer(serializers.ModelSerializer):
     like = serializers.SerializerMethodField()
-    comments = serializers.SerializerMethodField()
+    comment = serializers.SerializerMethodField()
     participants = serializers.SerializerMethodField()
     images = serializers.SerializerMethodField()
     channels = serializers.SerializerMethodField()
@@ -51,16 +51,20 @@ class EventDetailSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'title', 'description', 'location',
             'start_date', 'end_date',
-            'like', 'comments', 'participants', 'images', 'channels',
+            'like', 'comment', 'participants', 'images', 'channels',
         )
 
     def get_like(self, obj):
         return obj.like_set.count()
 
-    def get_comments(self, obj):
+    def get_comment(self, obj):
         comments = obj.comment_set.all()
-        serializers = CommentSerializer(comments, many=True)
-        return serializers.data
+        serializer = CommentBlockSerializer({
+            'offset': 0,
+            'event_id': obj.id,
+            'comments': comments,
+        })
+        return serializer.data
 
     def get_participants(self, obj):
         participations = obj.participation_set.all()
@@ -76,13 +80,40 @@ class EventDetailSerializer(serializers.ModelSerializer):
         return obj.event_channel_set.values_list('channel__channel', flat=True)
 
 
+class CommentBlockSerializer(serializers.Serializer):
+    load_more_comments = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
+    comments_per_load = 10
+
+    class Meta:
+        fields = ('load_more_comments', 'comments', )
+
+    def get_comments(self, obj):
+        comments = obj['comments']
+        offset = obj['offset']
+        limit = self.comments_per_load
+        comments = comments[offset:offset+limit]
+        serializers = CommentSerializer(comments, many=True)
+        return serializers.data
+
+    def get_load_more_comments(self, obj):
+        comments = obj['comments']
+        event_id = obj['event_id']
+        offset = obj['offset']
+        limit = self.comments_per_load
+        if limit + offset >= comments.count():
+            return None
+        return f'{settings.CURRENT_HOST}/api/events/{event_id}/comments?offset={offset+limit}'
+
+
 class CommentSerializer(serializers.ModelSerializer):
     username = serializers.SerializerMethodField()
     comment_id = serializers.SerializerMethodField()
 
     class Meta:
         model = Comment
-        fields = ('comment_id', 'username', 'content', )
+        fields = ('comment_id', 'username', 'content',
+                  'create_at', 'update_at', )
 
     def get_comment_id(self, obj):
         return obj.id

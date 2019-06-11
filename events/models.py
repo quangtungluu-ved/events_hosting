@@ -44,6 +44,9 @@ class Comment(BaseModel):
     def __str__(self):
         return self.content
 
+    class Meta:
+        ordering = ['-create_at']
+
 
 class Like(BaseModel):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
