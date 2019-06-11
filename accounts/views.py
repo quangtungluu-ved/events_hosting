@@ -1,7 +1,5 @@
-import requests
 from django.conf import settings
-from django.shortcuts import redirect
-from django.contrib.auth import login as django_login, logout as django_logout
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,6 +11,8 @@ from accounts.models import User
 from accounts.serializers import \
     VisitorDetailSerializer, VisitorUpdateSerializer, \
     VisitorCreateSerializer, LoginSerializer
+
+from services.oauth2.google import oauth2 as oauth2_google
 
 
 class LoginView(APIView):
@@ -92,30 +92,5 @@ class VisitorView(APIView):
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
-def oauth_google(request):
-    client_id = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
-    client_secret = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
-    redirect_uri = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
-    scope = 'email%20profile%20openid'
-    if 'code' not in request.GET:
-        auth_uri = ('https://accounts.google.com/o/oauth2/v2/auth?response_type=code'
-                    '&client_id={}&redirect_uri={}&scope={}').format(
-                        client_id,
-                        redirect_uri,
-                        scope)
-        return redirect(auth_uri)
-    else:
-        auth_code = request.GET.get('code')
-        data = {
-            'code': auth_code,
-            'client_id': client_id,
-            'client_secret': client_secret,
-            'redirect_uri': redirect_uri,
-            'grant_type': 'authorization_code'
-        }
-        resp = requests.post(
-            url='https://www.googleapis.com/oauth2/v4/token',
-            data=data
-        )
-        print(resp.text)
-        return redirect("/admin")
+def auth_google(request):
+    return oauth2_google(request)

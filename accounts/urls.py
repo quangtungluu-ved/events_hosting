@@ -13,8 +13,8 @@ urlpatterns = [
          name='vistor detail'),
     path('admin/visitors/', views.VisitorsView.as_view(),
          name='view list and create visitor'),
-    # oauth by google
-    path('auth-google/', views.oauth_google, name='oauth by google API'),
+    # auth by social
+    path('auth-google/', views.auth_google, name='oauth by google API'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
