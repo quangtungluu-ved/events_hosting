@@ -16,8 +16,14 @@ class Event(BaseModel):
     title = models.CharField(max_length=200)
     description = models.TextField()
     location = models.CharField(max_length=200, blank=True)
-    start_date = models.DateTimeField(db_index=True)
-    end_date = models.DateTimeField(db_index=True)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['start_date', 'end_date']),
+            models.Index(fields=['end_date'])
+        ]
 
     def __str__(self):
         return self.title
@@ -25,6 +31,9 @@ class Event(BaseModel):
 
 class Channel(BaseModel):
     channel = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.channel
 
 
 class Event_Channel(BaseModel):

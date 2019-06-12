@@ -6,7 +6,7 @@ from rest_framework.authtoken.models import Token
 
 from .models import Event, Comment, Channel, Image
 
-from services.mail.events import notify_on_changes
+from events.tasks import notify_on_event_changes, schedule
 
 
 # Register models from here.
@@ -31,10 +31,13 @@ class EventAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             obj.save()
+            schedule(obj)
             return
         old_obj = Event.objects.get(pk=obj.pk)
         obj.save()
         if old_obj.start_date != obj.start_date \
             or old_obj.end_date != obj.end_date \
                 or old_obj.location != obj.location:
-            notify_on_changes(obj)
+            notify_on_event_changes.delay(obj.id)
+        if old_obj.start_date != obj.start_date:
+            schedule(obj)

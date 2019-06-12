@@ -8,10 +8,10 @@ from django.contrib.auth import login as django_login
 from accounts.models import User
 
 
+SCOPE = 'email%20profile%20openid'
 CLIENT_ID = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
 CLIENT_SECRET = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
 REDIRECT_URI = settings.SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI
-SCOPE = 'email%20profile%20openid'
 VERIFY_AUTH_CODE_URI = 'https://www.googleapis.com/oauth2/v4/token'
 GET_AUTH_USERINFO_URI = 'https://www.googleapis.com/oauth2/v3/userinfo'
 
