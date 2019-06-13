@@ -18,6 +18,20 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from django_celery_beat.models import PeriodicTask, ClockedSchedule, \
+    CrontabSchedule, IntervalSchedule, SolarSchedule
+
+from rest_framework.authtoken.models import Token
+
+admin.autodiscover()
+admin.site.unregister(PeriodicTask)
+admin.site.unregister(ClockedSchedule)
+admin.site.unregister(IntervalSchedule)
+admin.site.unregister(CrontabSchedule)
+admin.site.unregister(SolarSchedule)
+admin.site.unregister(Token)
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('accounts.urls')),

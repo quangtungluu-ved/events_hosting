@@ -1,7 +1,7 @@
 from django.db import models
-from django.db.models import UniqueConstraint
 from django.utils import timezone
-from django.conf import settings
+from django.contrib.auth.models import User
+from django.db.models import UniqueConstraint
 
 
 class BaseModel(models.Model):
@@ -46,8 +46,7 @@ class Event_Channel(BaseModel):
 
 class Comment(BaseModel):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     content = models.CharField(max_length=250)
 
     def __str__(self):
@@ -59,8 +58,7 @@ class Comment(BaseModel):
 
 class Like(BaseModel):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ['user', 'event']
@@ -68,8 +66,7 @@ class Like(BaseModel):
 
 class Participation(BaseModel):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    user = models.ForeignKey(settings.AUTH_USER_MODEL,
-                             on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ['user', 'event']

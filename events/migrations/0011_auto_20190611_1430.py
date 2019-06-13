@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
             index=models.Index(fields=['end_date'], name='events_even_end_dat_ef2904_idx'),
         ),
         migrations.RunSQL(
-            ('CREATE FULLTEXT INDEX events_event_title_description_fulltext_index ON events_event(title, description)', ),
+            ('CREATE FULLTEXT INDEX events_event_title_description_fulltext_index ON events_event(title, description, location)', ),
             ('DROP INDEX events_event_title_description_fulltext_index on events_event', ),
         )
     ]

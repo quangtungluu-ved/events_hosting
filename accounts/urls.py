@@ -7,14 +7,12 @@ urlpatterns = [
     path('login/', views.LoginView.as_view(),
          name='login'),
     # admin CRUD visitors
-    path('admin/visitors/<int:visitor_id>', views.VisitorView.as_view(),
-         name='vistor detail'),
-    path('admin/visitors/', views.VisitorsView.as_view(),
-         name='view list and create visitor'),
+    # path('admin/visitors/<int:visitor_id>', views.VisitorView.as_view(),
+    #      name='vistor detail'),
+    # path('admin/visitors/', views.VisitorsView.as_view(),
+    #      name='view list and create visitor'),
     # auth by social
     path('auth-google/', views.auth_google, name='oauth by google API'),
-    # testing
-    path('test-access/', views.test_access, name='testing_api'),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -19,12 +19,12 @@ def like_event(request, event_id):
         if saved_event.like_set.filter(user=current_user.id).exists():
             saved_event.like_set.filter(user=current_user.id).delete()
             return Response({
-                'like': True,
+                'like': False,
                 'msg': f'remove like on event {saved_event.title}'})
         else:
             saved_event.like_set.add(Like(user=current_user), bulk=False)
             return Response({
-                'like': False,
+                'like': True,
                 'msg': f'like event {saved_event.title}'})
     except Event.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -42,11 +42,14 @@ def participate_event(request, event_id):
                 'msg': f'Leave event {saved_event.title}'})
         else:
             concurent_participations = current_user.participation_set.filter(
-                Q(event__start_date__lte=saved_event.start_date, event__end_date__gte=saved_event.start_date)
+                Q(event__start_date__lte=saved_event.start_date,
+                  event__end_date__gte=saved_event.start_date)
                 |
-                Q(event__start_date__gt=saved_event.start_date, event__start_date__lte=saved_event.end_date))
+                Q(event__start_date__gt=saved_event.start_date,
+                  event__start_date__lte=saved_event.end_date))
             concurent_events = list(map(
-                lambda x: {'event_id': x.event.id, 'event_title': x.event.title},
+                lambda x: {'event_id': x.event.id,
+                           'event_title': x.event.title},
                 concurent_participations))
             saved_event.participation_set.add(
                 Participation(user=current_user), bulk=False)

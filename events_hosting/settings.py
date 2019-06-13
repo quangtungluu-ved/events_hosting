@@ -48,8 +48,6 @@ INSTALLED_APPS = [
     'django_celery_beat',
 ]
 
-AUTH_USER_MODEL = 'accounts.User'
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

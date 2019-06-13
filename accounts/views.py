@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.contrib.auth.models import User
 
 from rest_framework import status
 from rest_framework.views import APIView
@@ -7,7 +8,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 
-from accounts.models import User
 from accounts.serializers import \
     VisitorDetailSerializer, VisitorUpdateSerializer, \
     VisitorCreateSerializer, LoginSerializer
@@ -15,11 +15,6 @@ from accounts.serializers import \
 from services.oauth2.google import oauth2 as oauth2_google
 
 from rest_framework_jwt.settings import api_settings
-
-
-@api_view(['GET'])
-def test_access(request):
-    return Response('accessed')
 
 
 class LoginView(APIView):

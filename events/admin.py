@@ -3,11 +3,8 @@ from django.contrib import admin
 from django.contrib.auth.models import Group
 
 from rest_framework.authtoken.models import Token
-
 from .models import Event, Comment, Channel, Image
-
 from events.tasks import notify_on_event_changes, schedule
-
 
 # Register models from here.
 admin.site.register(Channel)

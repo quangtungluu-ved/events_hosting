@@ -71,13 +71,13 @@ class SearchByKeyword:
         self.keywords = list(filter(None, self.keywords.split(',')))
 
     def apply(self, query_set):
-        keyword_queries = Q()
-        for keyword in self.keywords:
-            keyword_queries |= (Q(description__icontains=keyword)
-                                | Q(title__icontains=keyword)
-                                | Q(location__icontains=keyword))
         res = query_set
-        res = res.filter(keyword_queries)
+        if not len(self.keywords):
+            return res
+        match_query = 'MATCH(title, description, location) AGAINST (%s)'
+        res = res.extra(
+            where=[' | '.join([match_query] * len(self.keywords))],
+            params=self.keywords)
         return res
 
 

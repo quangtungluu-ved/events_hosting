@@ -22,7 +22,6 @@ def schedule(event):
     cron_schedule, _ = CrontabSchedule.objects.get_or_create(
         minute=notify_time.minute,
         hour=notify_time.hour,
-        day_of_week='*',
         day_of_month=notify_time.day,
         month_of_year=notify_time.month,
         timezone=settings.TIME_ZONE)
@@ -43,7 +42,6 @@ def notify_before_start(event_id):
             clear_schedule(event)
             return False
         mail_service.events.notify_before_start(event)
-        # delete task after done
         clear_schedule(event)
         return True
     except Event.DoesNotExist:
