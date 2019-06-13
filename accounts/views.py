@@ -14,6 +14,13 @@ from accounts.serializers import \
 
 from services.oauth2.google import oauth2 as oauth2_google
 
+from rest_framework_jwt.settings import api_settings
+
+
+@api_view(['GET'])
+def test_access(request):
+    return Response('accessed')
+
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -24,14 +31,12 @@ class LoginView(APIView):
         user = serializer.validated_data['user']
         if not user:
             return Response(status=status.HTTP_404_NOT_FOUND)
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key}, status=status.HTTP_200_OK)
-
-
-class LogoutView(APIView):
-    def post(self, request):
-        request.user.auth_token.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        payload = api_settings.JWT_PAYLOAD_HANDLER(user)
+        token = api_settings.JWT_ENCODE_HANDLER(payload)
+        return Response({
+            **payload,
+            'token': token,
+            'exp': settings.JWT_AUTH['JWT_EXPIRATION_DELTA'].total_seconds()})
 
 
 class VisitorsView(APIView):

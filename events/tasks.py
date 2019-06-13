@@ -39,6 +39,9 @@ def notify_before_start(event_id):
         event = Event.objects.get(pk=event_id)
         if timezone.now() < event.start_date - timedelta(hours=1, minutes=5):
             return False
+        if timezone.now() > event.start_date:
+            clear_schedule(event)
+            return False
         mail_service.events.notify_before_start(event)
         # delete task after done
         clear_schedule(event)
