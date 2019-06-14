@@ -1,0 +1,73 @@
+<!-- chat/templates/chat/room.html -->
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <title>Event {{event.title}}</title>
+</head>
+
+<body>
+    <div class="container my-4 mx-auto">
+        <div class="card" style="width: 30rem;">
+            <div class="card-body">
+                <h3 class="card-title">{{event.title}}</h3>
+                <p class="card-text">{{event.description}}</p>
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <span style="color: cornflowerblue;">Like</span>
+                        <span id="like">{{event.like}}</span>
+                    </div>
+                    <div>
+                            <span style="color: cornflowerblue;">Participants</span>
+                            <span id="participants">{{event.participants}}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    const event_id = {{ event.id }};
+
+    var eventSocket = new WebSocket(
+        'ws://' + window.location.host +
+        '/ws/event/' + event_id + '/');
+
+    eventSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        const type = data['type'];
+        const message = data['message'];
+        if (type === 'update_like') {
+            document.querySelector('#like').innerText = message;
+        } else if (type === 'update_participants') {
+            document.querySelector('#participants').innerText = message
+        }
+
+    };
+
+    // chatSocket.onclose = function(e) {
+    //     console.error('Chat socket closed unexpectedly');
+    // };
+
+    // document.querySelector('#chat-message-input').focus();
+    // document.querySelector('#chat-message-input').onkeyup = function(e) {
+    //     if (e.keyCode === 13) {  // enter, return
+    //         document.querySelector('#chat-message-submit').click();
+    //     }
+    // };
+
+    // document.querySelector('#chat-message-submit').onclick = function(e) {
+    //     var messageInputDom = document.querySelector('#chat-message-input');
+    //     var message = messageInputDom.value;
+    //     chatSocket.send(JSON.stringify({
+    //         'message': message
+    //     }));
+
+    //     messageInputDom.value = '';
+    // };
+</script>
+
+</html>

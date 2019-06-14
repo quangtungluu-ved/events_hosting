@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'django_celery_beat',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -149,12 +150,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# OAuth by Google Configure
+# OAuth by Google configure
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'EEzrJBHSSAgWwHv1aTu1Tm3b'
 SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = 'http://localhost:8000/api/auth-google'
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '815145854065-k955hp4vf948abt79rpfiuo9estn1b50.apps.googleusercontent.com'
 
-# Email Sending Confiure
+# Email Sending confiure
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
@@ -162,7 +163,18 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'quangtungluu18.test@gmail.com'
 EMAIL_HOST_PASSWORD = 'Tung123456789'
 
-# Celery configure
+# Celery configure for async and periodic tasks
 CELERY_BROKER_URL = 'redis://localhost:6379'
 CELERY_ENABLE_UTC = True
 CELERY_TIMEZONE = TIME_ZONE
+
+# ASGI configure for websocket
+ASGI_APPLICATION = 'events_hosting.urls.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)]
+        }
+    }
+}

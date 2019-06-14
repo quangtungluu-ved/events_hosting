@@ -1,5 +1,7 @@
 from events import views
 from django.urls import path
+from django.conf.urls import url
+from .consumers import EventViewConsumer
 
 urlpatterns = [
     path('events/<int:event_id>', views.EventView.as_view(),
@@ -16,4 +18,10 @@ urlpatterns = [
          name='comment_on_an_event'),
     path('events/<int:event_id>/comments/<int:comment_id>', views.edit_comment_event,
          name='edit_comment_on_an_event'),
+    path('events/view_detail/<int:event_id>', views.view_event_detail),
+]
+
+
+websocket_urlpatterns = [
+    url(r'^ws/event/(?P<event_id>[^/]+)/$', EventViewConsumer)
 ]

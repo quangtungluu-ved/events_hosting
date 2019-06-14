@@ -8,6 +8,8 @@ from django.db.models import Q
 from events.models import Like, Participation, Comment, Event
 from events.serializers import CommentSerializer, CommentBlockSerializer
 
+from events.consumers import EventUpdateToChannel
+
 from utils.permissions import CommentOwnerOnly
 
 
@@ -18,14 +20,18 @@ def like_event(request, event_id):
         saved_event = Event.objects.get(pk=event_id)
         if saved_event.like_set.filter(user=current_user.id).exists():
             saved_event.like_set.filter(user=current_user.id).delete()
-            return Response({
+            resp = Response({
                 'like': False,
                 'msg': f'remove like on event {saved_event.title}'})
         else:
             saved_event.like_set.add(Like(user=current_user), bulk=False)
-            return Response({
+            resp = Response({
                 'like': True,
                 'msg': f'like event {saved_event.title}'})
+        EventUpdateToChannel.update_like(
+            event_id=saved_event.id,
+            like=saved_event.like_set.count())
+        return resp
     except Event.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -37,7 +43,7 @@ def participate_event(request, event_id):
         saved_event = Event.objects.get(pk=event_id)
         if saved_event.participation_set.filter(user=current_user).exists():
             saved_event.participation_set.filter(user=current_user).delete()
-            return Response({
+            resp = Response({
                 'participate': False,
                 'msg': f'Leave event {saved_event.title}'})
         else:
@@ -53,10 +59,14 @@ def participate_event(request, event_id):
                 concurent_participations))
             saved_event.participation_set.add(
                 Participation(user=current_user), bulk=False)
-            return Response({
+            resp = Response({
                 'participate': True,
                 'msg': f'Participate event {saved_event.title}',
                 'concurent_events': concurent_events})
+        EventUpdateToChannel.update_participants(
+            event_id=saved_event.id,
+            participants=saved_event.participation_set.count())
+        return resp
     except Event.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 

@@ -18,6 +18,9 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+from channels.routing import ProtocolTypeRouter, URLRouter
+import events.urls
+
 from django_celery_beat.models import PeriodicTask, ClockedSchedule, \
     CrontabSchedule, IntervalSchedule, SolarSchedule
 
@@ -37,3 +40,11 @@ urlpatterns = [
     path('api/', include('accounts.urls')),
     path('api/', include('events.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+application = ProtocolTypeRouter({
+    'websocket': (
+        URLRouter(
+            events.urls.websocket_urlpatterns
+        )
+    )
+})
