@@ -98,7 +98,7 @@ def comment_event(request, event_id):
 @api_view(['PUT'])
 @permission_classes([CommentOwnerOnly])
 def edit_comment_event(request, event_id, comment_id):
-    current_user = request.u200ser
+    current_user = request.user
     try:
         saved_comment = Comment.objects.get(pk=comment_id)
         serializer = CommentSerializer(

@@ -103,7 +103,7 @@ WSGI_APPLICATION = 'events_hosting.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'events_hosting',
+        'NAME': 'events',
         'USER': 'testing',
         'PASSWORD': 'Test@1234',
         'HOST': '127.0.0.1',
@@ -176,5 +176,22 @@ CHANNEL_LAYERS = {
         'CONFIG': {
             'hosts': [('127.0.0.1', 6379)]
         }
+    }
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        }
+    },
+    'loggers': {
+        'django.db.backends': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
     }
 }
