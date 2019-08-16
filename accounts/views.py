@@ -31,7 +31,8 @@ class LoginView(APIView):
         return Response({
             **payload,
             'token': token,
-            'exp': settings.JWT_AUTH['JWT_EXPIRATION_DELTA'].total_seconds()})
+            'exp': settings.JWT_AUTH['JWT_EXPIRATION_DELTA'].total_seconds()
+        })
 
 
 class VisitorsView(APIView):
