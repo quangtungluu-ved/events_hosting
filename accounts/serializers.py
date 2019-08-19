@@ -12,7 +12,11 @@ class LoginSerializer(serializers.Serializer):
     def validate(self, data):
         username = data.get('username', '')
         password = data.get('password', '')
-        user = django_auth(username=username, password=password)
+        users = User.objects.filter(username=username)
+        if not len(users):
+            user = None
+        else:
+            user = users[0]
         data['user'] = user
         return data
 

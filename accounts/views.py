@@ -16,6 +16,7 @@ from services.oauth2.google import oauth2 as oauth2_google
 
 from rest_framework_jwt.settings import api_settings
 
+import json
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -27,11 +28,14 @@ class LoginView(APIView):
         if not user:
             return Response(status=status.HTTP_404_NOT_FOUND)
         payload = api_settings.JWT_PAYLOAD_HANDLER(user)
-        token = api_settings.JWT_ENCODE_HANDLER(payload)
+        # token = api_settings.JWT_ENCODE_HANDLER(payload)
+        # return Response({
+            # **payload,
+            # 'token': token,
+            # 'exp': settings.JWT_AUTH['JWT_EXPIRATION_DELTA'].total_seconds()
+        # })
         return Response({
-            **payload,
-            'token': token,
-            'exp': settings.JWT_AUTH['JWT_EXPIRATION_DELTA'].total_seconds()
+            **payload
         })
 
 
