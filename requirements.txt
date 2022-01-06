@@ -1,5 +1,5 @@
 autopep8==1.4.4
-celery==4.3.0
+celery==5.2.2
 channels==2.2.0
 channels-redis==2.4.0
 Django==2.2.2
